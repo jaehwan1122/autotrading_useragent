@@ -110,6 +110,7 @@ class ExecuteRequest(BaseModel):
 
 async def register_with_central(agent_url: str):
     """중앙 서버에 Agent URL 등록"""
+    await asyncio.sleep(3)  # 서버가 요청을 받을 수 있을 때까지 대기
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             resp = await client.post(
@@ -365,7 +366,7 @@ async def lifespan(app: FastAPI):
     if railway_domain:
         agent_url = f"https://{railway_domain}"
         logger.info(f"Agent URL: {agent_url}")
-        await register_with_central(agent_url)
+        asyncio.create_task(register_with_central(agent_url))
     else:
         logger.warning("RAILWAY_PUBLIC_DOMAIN not set - skipping registration (local mode)")
 
